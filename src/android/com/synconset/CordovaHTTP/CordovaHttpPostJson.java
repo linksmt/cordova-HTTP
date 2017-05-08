@@ -36,6 +36,20 @@ public class CordovaHttpPostJson extends CordovaHttp implements Runnable {
             String body = request.body(CHARSET);
             JSONObject response = new JSONObject();
             response.put("status", code);
+			JSONObject intestazioni = new JSONObject();
+			for (Map.Entry entry: request.headers().entrySet()) {
+				if (entry.getKey() != null) {
+					if(entry.getValue()!=null){
+						String valore = entry.getValue().toString();
+						intestazioni.put(entry.getKey().toString(), valore.substring(1, valore.length()-1));
+					}
+					else
+						intestazioni.put(entry.getKey().toString(), null);
+				} 
+			}
+			response.put("headersJSON", intestazioni);
+			response.put("headers", request.headers());
+			
             if (code >= 200 && code < 300) {
                 response.put("data", body);
                 this.getCallbackContext().success(response);
