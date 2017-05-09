@@ -53,6 +53,9 @@ var http = {
     postJson: function(url, json, headers, success, failure) {
         return exec(success, failure, "CordovaHttpPlugin", "postJson", [url, json, headers]);
     },
+	postJsonAlba: function(url, json, headers, success, failure) {
+        return exec(success, failure, "CordovaHttpPlugin", "postJsonAlba", [url, json, headers]);
+    },
     get: function(url, params, headers, success, failure) {
         headers = mergeHeaders(this.headers, headers);
         return exec(success, failure, "CordovaHttpPlugin", "get", [url, params, headers]);
@@ -159,6 +162,9 @@ if (typeof angular !== "undefined") {
                 return makePromise(http.post, [url, params, headers], true);
             },
             postJson: function(url, json, headers) {
+                return makePromise(http.postJson, [url, json, headers], true);
+            },
+			postJsonAlba: function(url, json, headers) {
                 return makePromise(http.postJson, [url, json, headers], true);
             },
             get: function(url, params, headers) {
