@@ -2,6 +2,7 @@
 #import "CDVFile.h"
 #import "TextResponseSerializer.h"
 #import "AFHTTPSessionManager.h"
+#import "LKSJSONStringRequestSerializer.h"
 
 @interface CordovaHttpPlugin()
 
@@ -111,6 +112,52 @@
         NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
         [self setResults: dictionary withTask: task];
         [dictionary setObject:responseObject forKey:@"data"];
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:dictionary];
+        [weakSelf.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    } failure:^(NSURLSessionTask *task, NSError *error) {
+        NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+        [self setResults: dictionary withTask: task];
+        NSString* errResponse = [[NSString alloc] initWithData:(NSData *)error.userInfo[AFNetworkingOperationFailingURLResponseDataErrorKey] encoding:NSUTF8StringEncoding];
+        [dictionary setObject:errResponse forKey:@"error"];
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:dictionary];
+        [weakSelf.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)postJsonAlba:(CDVInvokedUrlCommand*)command {
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    manager.securityPolicy = securityPolicy;
+    NSString *url = [command.arguments objectAtIndex:0];
+
+    NSDictionary *headers = [command.arguments objectAtIndex:2];
+    [headers setValue:@"application/json" forKey:@"Content-Type"];
+    [self setRequestHeaders: headers forManager: manager];
+    
+    id parameters = [command.arguments objectAtIndex:1];
+    if ([parameters isKindOfClass:[NSString class]]){
+        
+        manager.requestSerializer = [LKSJSONStringRequestSerializer serializer];
+        
+        [headers enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+            [manager.requestSerializer setValue:obj forHTTPHeaderField:key];
+        }];
+        
+    }
+    CordovaHttpPlugin* __weak weakSelf = self;
+    
+    manager.responseSerializer = [TextResponseSerializer serializer];
+    [manager POST:url parameters:parameters progress:nil success:^(NSURLSessionTask *task, id responseObject) {
+        NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+        [self setResults: dictionary withTask: task];
+        [dictionary setObject:responseObject forKey:@"data"];
+        
+        NSHTTPURLResponse *response = ((NSHTTPURLResponse *)[task response]);
+        NSDictionary *responseHeaders = [response allHeaderFields];
+        NSLog(@"%@", responseHeaders);
+        
+        [dictionary setObject:responseHeaders forKey:@"headers"];
+        [dictionary setObject:responseHeaders forKey:@"headersJSON"];
+        
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:dictionary];
         [weakSelf.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     } failure:^(NSURLSessionTask *task, NSError *error) {
