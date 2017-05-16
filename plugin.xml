@@ -34,6 +34,9 @@
         <header-file src="src/ios/TextResponseSerializer.h" />
         <source-file src="src/ios/TextResponseSerializer.m" />
 
+        <header-file src="src/ios/LKSJSONStringRequestSerializer.h" />
+        <source-file src="src/ios/LKSJSONStringRequestSerializer.m" />
+        
         <header-file src="src/ios/AFNetworking/AFHTTPSessionManager.h" />
         <source-file src="src/ios/AFNetworking/AFHTTPSessionManager.m" />
 
