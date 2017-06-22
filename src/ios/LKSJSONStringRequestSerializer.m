@@ -48,7 +48,7 @@
             [mutableRequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
         }
         
-        NSLog(@"INPUT: %@", parameters);
+        //NSLog(@"INPUT: %@", parameters);
         
         [mutableRequest setHTTPBody:[parameters dataUsingEncoding:NSUTF8StringEncoding]];
     }

@@ -153,7 +153,7 @@
 
         NSHTTPURLResponse *response = ((NSHTTPURLResponse *)[task response]);
         NSDictionary *responseHeaders = [response allHeaderFields];
-        NSLog(@"%@", responseHeaders);
+        //NSLog(@"%@", responseHeaders);
 
         [dictionary setObject:responseHeaders forKey:@"headers"];
         [dictionary setObject:responseHeaders forKey:@"headersJSON"];
