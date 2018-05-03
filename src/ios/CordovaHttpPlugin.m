@@ -165,12 +165,19 @@
         [self setResults: dictionary withTask: task];
         NSString* errResponse = [[NSString alloc] initWithData:(NSData *)error.userInfo[AFNetworkingOperationFailingURLResponseDataErrorKey] encoding:NSUTF8StringEncoding];
 
+        // mpolito: Forward dello status code corretto
+        NSInteger statusCode = 500;
+        if ([task.response isKindOfClass:[NSHTTPURLResponse class]]) {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)task.response;
+            statusCode = httpResponse.statusCode;
+        }
+
         // fcorvino: Intervento per restituire un messaggio json all'applicazione
         if( [errResponse isEqualToString:@""]){
             errResponse = @"SSL handshake failed";
         }
         [dictionary setObject:errResponse forKey:@"error"];
-        [dictionary setObject:[NSNumber numberWithInt:500] forKey:@"status"];
+        [dictionary setObject:[NSNumber numberWithInteger:statusCode] forKey:@"status"];
         // fine intervento
 
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:dictionary];
